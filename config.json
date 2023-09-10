@@ -1,0 +1,9 @@
+{
+    "directory_data_path":"C:\\Users\\alexsey\\Desktop\\проекты\\geophysical utils\\geophysic_utils\\test_diff",
+    "directory_mask_path":"C:\\Users\\alexsey\\Desktop\\проекты\\geophysical utils\\geophysic_utils\\test_diff_mask",
+    "batch_size":32,
+    "shuffle":true,
+    "max_epochs":10,
+    "learning_rate_pow":-5,
+    "test_sample_path":"C:\\Users\\alexsey\\Desktop\\проекты\\данные сейсмики без пикировок\\Радарные данные для гранта\\ice1.sgy"
+}
