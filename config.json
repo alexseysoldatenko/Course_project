@@ -1,7 +1,4 @@
 {
-    "directory_data_path":"C:\\Users\\alexsey\\Desktop\\проекты\\geophysical utils\\geophysic_utils\\test_diff",
-    "directory_mask_path":"C:\\Users\\alexsey\\Desktop\\проекты\\geophysical utils\\geophysic_utils\\test_diff_mask",
-    "batch_size":32,
     "directory_data_path":"test_diff",
     "directory_mask_path":"test_diff_mask",
     "batch_size":16,
