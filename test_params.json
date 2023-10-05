@@ -1,0 +1,4 @@
+{
+    "weights_path": "test_MAnet_250_epochs.pt",
+    "data_path": "data\\ice1.sgy"
+}
