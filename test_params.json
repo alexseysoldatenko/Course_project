@@ -1,4 +1,4 @@
 {
-    "weights_path": "test_MAnet_250_epochs.pt",
-    "data_path": "data\\ice1.sgy"
+    "weights_path": "/media/alexsey/Extreme SSD/test_MAnet_250_epochs.pt",
+    "data_path": "/media/alexsey/Extreme SSD/Радарные данные для гранта/ice1.sgy"
 }

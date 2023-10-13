@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-import impulse
+import synthetic_data_generator.impulse as impulse
 import matplotlib.pyplot as plt
 import random
 import json
@@ -97,9 +97,88 @@ class Seismogram:
     def add_artifacts(self):
         pass
 
+def get_sample():
+    with open('synthetic_data_generator/params_generator.json', 'r') as f:
+        params = json.load(f)
+
+    for i in range(params['numbers_of_samples']):
+        number_of_hyperbolas = np.random.randint(
+                                                params['min_number_of_hyperbolas'],
+                                                params['max_number_of_hyperbolas'])
+        impulse_len = np.random.randint(
+                                        params['min_impulse_length_hyperbolas'],
+                                        params['max_impulse_length_hyperbolas'])
+        number_of_sins = np.random.uniform(1,4)
+        phase = bool(random.getrandbits(1))
+        impulse_type = np.random.choice(['sin', 'sinc'])
+        impulse_test = impulse.generate_impulse(impulse_type, impulse_len, impulse_len/np.pi/number_of_sins, start_phase=phase)
+        impulse_test.normalize_impulse()
+        if impulse_type == 'sinc':
+            
+            impulse_test.form += 1e-6
+        seismogram = Seismogram((128, 128), impulse=impulse_test)
+        blur_factor = params["blur_factor"]
+        blur_orientation = 'right'
+        blur = False
+        for _ in range(number_of_hyperbolas):
+            speed = np.random.uniform(
+                                        params["min_speed_hyperbolas"],
+                                        params["max_speed_hyperbolas"])
+            start_trace = np.random.randint(
+                                            params["min_trace_sample_start"],
+                                            params["max_trace_sample_start"])
+            start_time = np.random.randint(
+                                            params["min_time_sample_start"] * speed,
+                                            params["max_time_sample_start"] * speed)
+            left_limit = np.random.randint(                                    
+                                            params["min_left_limit"],
+                                            params["max_left_limit"])
+            right_limit = np.random.randint(                                    
+                                            params["min_right_limit"],
+                                            params["max_right_limit"])
+            blur = decision(0.2)
+            if blur:
+                blur_orientation = np.random.choice(['right', 'left'])
+                blur_factor = np.random.uniform(                                    
+                                                params["min_blur_value"],
+                                                params["max_blur_value"])
+            seismogram.add_hyperbola(start_trace = start_trace,speed = speed, start_time=start_time, limits = [left_limit, right_limit], blur = blur, blur_orientation = blur_orientation, blur_factor = blur_factor)
+            
+        seismogram.convolve_with_impulse()
+        
+        mask = seismogram.canvas.reshape((1,seismogram.canvas.shape[0],seismogram.canvas.shape[1])).copy()
+        right_mask = np.where(mask != 0, 1, 0)
+        wrong_mask = np.where(mask != 0, 0, 1)
+        output_mask = torch.from_numpy(np.concatenate((right_mask, wrong_mask), axis=0).copy()).float()
+        number_of_reflection = np.random.randint(                                    
+                                                params["min_number_of_reflections"],
+                                                params["max_number_of_reflections"])
+        for refl in range(number_of_reflection):
+            impulse_len = np.random.randint(                                    
+                                            params["min_impulse_length_reflections"],
+                                            params["max_impulse_length_reflections"])
+            number_of_sins = np.random.uniform(1,6)
+            impulse_test = impulse.generate_impulse('sin', impulse_len, impulse_len/np.pi/number_of_sins, start_phase=phase)
+            seismogram.impulse = impulse_test
+            slope = np.random.randint(                                    
+                                        params["min_slope"],
+                                        params["max_slope"])
+            padding = np.random.randint(                                    
+                                        params["min_padding"],
+                                        params["max_padding"])
+            orientation = np.random.choice(['left', 'right'])
+            seismogram.add_reflection(slope = slope, padding = padding, orientation = orientation)
+        noise_strong = np.random.uniform(                                    
+                                        params["min_noise_strong"],
+                                        params["max_noise_strong"])
+        seismogram.add_normal_noise(sigma=noise_strong).normalize()
+        output_data = torch.from_numpy(seismogram.canvas.copy()).float()
+        return output_data, output_mask
+
+
 if __name__ == '__main__':
     
-    with open('params_generator.json', 'r') as f:
+    with open('synthetic_data_generator/params_generator.json', 'r') as f:
         params = json.load(f)
 
     for i in range(params['numbers_of_samples']):
@@ -174,6 +253,6 @@ if __name__ == '__main__':
                                         params["min_noise_strong"],
                                         params["max_noise_strong"])
         seismogram.add_normal_noise(sigma=noise_strong).normalize().to_tensor(path = f'{params["test_diff_data"]}\\{params["prefix"]}.pt')
-
+        
 
         

@@ -1,9 +1,9 @@
 {
-    "directory_data_path":"test_diff",
-    "directory_mask_path":"test_diff_mask",
-    "batch_size":16,
+    "model_path":"/media/alexsey/Extreme SSD/test_MAnet_250_epochs.pt",
+    "epoch_len":1500,
+    "batch_size":32,
     "shuffle":true,
-    "max_epochs":10,
+    "max_epochs":50,
     "learning_rate_pow":-3,
     "test_sample_path":"/media/alexsey/Extreme SSD/Радарные данные для гранта/ice1.sgy"
 }
